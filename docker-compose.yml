@@ -1,0 +1,21 @@
+services:
+  mysql:
+    container_name: mysql-db-server
+    image: mysql:lts
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: store
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql:rw
+    networks:
+      - store-net
+
+networks:
+  store-net:
+    driver: bridge
+
+volumes:
+  mysql_data:
