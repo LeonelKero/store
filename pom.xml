@@ -69,12 +69,14 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>10.20.1</version>
+                <version>11.10.4</version>
                 <configuration>
                     <url>jdbc:mysql://localhost:3306/store?createDatabaseIfNotExist=true</url>
                     <user>root</user>
                     <password>root</password>
                     <cleanDisabled>false</cleanDisabled>
+                    <baselineOnMigrate>true</baselineOnMigrate>
+                    <baselineVersion>1.0</baselineVersion>
                 </configuration>
             </plugin>
             <plugin>
