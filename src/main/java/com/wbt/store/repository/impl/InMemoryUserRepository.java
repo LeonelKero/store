@@ -1,6 +1,6 @@
 package com.wbt.store.repository.impl;
 
-import com.wbt.store.entity.User;
+import com.wbt.store.entities.User;
 import com.wbt.store.repository.UserRepository;
 import org.springframework.stereotype.Repository;
 

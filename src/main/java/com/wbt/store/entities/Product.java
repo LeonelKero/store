@@ -1,4 +1,4 @@
-package com.wbt.store.entity;
+package com.wbt.store.entities;
 
 import jakarta.persistence.*;
 import lombok.*;

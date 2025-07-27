@@ -1,6 +1,6 @@
 package com.wbt.store.repository;
 
-import com.wbt.store.entity.User;
+import com.wbt.store.entities.User;
 
 import java.util.Optional;
 
