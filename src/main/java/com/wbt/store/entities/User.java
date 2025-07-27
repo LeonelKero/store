@@ -28,8 +28,7 @@ public class User {
     @Column(nullable = false, name = "password")
     private String password;
 
-    @OneToOne()
-    @JoinColumn(name = "profile_id")
+    @OneToOne(mappedBy = "user")
     private Profile profile;
 
     @ManyToMany
