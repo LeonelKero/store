@@ -49,7 +49,7 @@ public class User {
         tag.removeUser(this);
     }
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST}, orphanRemoval = true)
     @Builder.Default
     private Set<Address> addresses = new HashSet<>();
 
@@ -70,4 +70,12 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "product_id")})
     @Builder.Default
     private Set<Product> wishlist = new HashSet<>();
+
+    public void addToWishList(final Product product) {
+        this.wishlist.add(product);
+    }
+
+    public void removeToWishlist(final Product product) {
+        this.wishlist.remove(product);
+    }
 }

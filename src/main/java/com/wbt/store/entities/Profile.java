@@ -28,7 +28,7 @@ public class Profile {
     @Column(name = "loyalty_points")
     private Integer loyaltyPoints;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.REMOVE})
     @JoinColumn(name = "user_id")
     private User user;
 }

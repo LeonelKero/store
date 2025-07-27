@@ -27,5 +27,6 @@ public class Category {
 
     public void addProduct(final Product product) {
         this.products.add(product);
+        product.addCategory(this);
     }
 }
