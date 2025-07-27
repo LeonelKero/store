@@ -18,11 +18,14 @@ public class Profile {
     private Long id;
 
     private String bio;
+
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "date_of_birth")
     private LocalDate dateOfBirth;
 
+    @Column(name = "loyalty_points")
     private Integer loyaltyPoints;
 
     @OneToOne(mappedBy = "profile")
