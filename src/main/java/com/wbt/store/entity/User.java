@@ -3,9 +3,7 @@ package com.wbt.store.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -13,22 +11,25 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "name")
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, name = "email")
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "password")
     private String password;
 
-    @OneToOne
+    @OneToOne()
+    @JoinColumn(name = "profile_id")
     private Profile profile;
 
     @ManyToMany
@@ -36,8 +37,30 @@ public class User {
             name = "user_tags",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id")})
-    private List<Tag> tags = new ArrayList<>();
+    @Builder.Default
+    private Set<Tag> tags = new HashSet<>();
+
+    public void addTag(final Tag tag) {
+        this.tags.add(tag);
+        tag.addUser(this);
+    }
+
+    public void removeTag(final Tag tag) {
+        this.tags.remove(tag);
+        tag.removeUser(this);
+    }
 
     @OneToMany(mappedBy = "user")
+    @Builder.Default
     private Set<Address> addresses = new HashSet<>();
+
+    public void addAddresses(final Address address) {
+        this.addresses.add(address);
+        address.setUser(this);
+    }
+
+    public void removeAddress(final Address address) {
+        this.addresses.remove(address);
+        address.setUser(null);
+    }
 }
