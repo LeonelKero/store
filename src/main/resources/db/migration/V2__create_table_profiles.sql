@@ -6,5 +6,5 @@ create TABLE profiles (
   loyalty_points int UNSIGNED DEFAULT 0,
   user_id bigint DEFAULT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_users_profile FOREIGN KEY (user_id) REFERENCES users (id)
+  CONSTRAINT FK_users_profile FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );

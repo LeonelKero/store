@@ -5,5 +5,5 @@ create TABLE addresses (
   user_id BIGINT,
   PRIMARY KEY (id),
   KEY FK_users_addresses (user_id),
-  CONSTRAINT FK_users_addresses FOREIGN KEY (user_id) REFERENCES users (id) ON delete CASCADE
+  CONSTRAINT FK_users_addresses FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
