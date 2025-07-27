@@ -24,7 +24,7 @@ public class Address {
     @Column(nullable = false, name = "street")
     private String street;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 }
