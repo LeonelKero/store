@@ -31,24 +31,6 @@ public class User {
     @OneToOne(mappedBy = "user")
     private Profile profile;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_tags",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "tag_id")})
-    @Builder.Default
-    private Set<Tag> tags = new HashSet<>();
-
-    public void addTag(final Tag tag) {
-        this.tags.add(tag);
-        tag.addUser(this);
-    }
-
-    public void removeTag(final Tag tag) {
-        this.tags.remove(tag);
-        tag.removeUser(this);
-    }
-
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST}, orphanRemoval = true)
     @Builder.Default
     private Set<Address> addresses = new HashSet<>();
