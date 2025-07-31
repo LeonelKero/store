@@ -21,12 +21,7 @@ public class Category {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "categories")
+    @OneToMany(mappedBy = "category")
     @Builder.Default
     private Set<Product> products = new HashSet<>();
-
-    public void addProduct(final Product product) {
-        this.products.add(product);
-        product.addCategory(this);
-    }
 }

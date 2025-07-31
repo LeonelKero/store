@@ -29,18 +29,9 @@ public class Product {
     @Column(name = "price", nullable = false)
     private BigDecimal price;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH})
-    @JoinColumn(
-            name = "category_id",
-            foreignKey = @ForeignKey(name = "FK_product_category", value = ConstraintMode.CONSTRAINT)
-    )
-    @Builder.Default
-    private Set<Category> categories = new HashSet<>();
-
-    public void addCategory(final Category category) {
-        this.categories.add(category);
-        category.addProduct(this);
-    }
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @ManyToMany(mappedBy = "wishlist")
     @Builder.Default
