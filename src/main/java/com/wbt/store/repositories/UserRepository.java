@@ -12,7 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @EntityGraph(attributePaths = {"tags"})
     Optional<User> findByEmail(String email);
 
-    @EntityGraph(attributePaths = {"addresses"})
+//    @EntityGraph(attributePaths = {"addresses"})
     // must add a query here
-    List<User> findAllWithAddresses();
+//    List<User> findAllWithAddresses();
 }
