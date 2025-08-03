@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -36,4 +38,8 @@ public class Product {
     @ManyToMany(mappedBy = "wishlist")
     @Builder.Default
     private Set<User> users = new HashSet<>();
+
+    @OneToMany(mappedBy = "product")
+    @JoinColumn(name = "card_item_id")
+    private List<CartItem> cartItems = new ArrayList<>();
 }
