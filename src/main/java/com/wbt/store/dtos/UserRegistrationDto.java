@@ -1,5 +1,6 @@
 package com.wbt.store.dtos;
 
+import com.wbt.store.annotations.Lowercase;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -11,6 +12,7 @@ public record UserRegistrationDto(
 
         @NotBlank(message = "Email is required")
         @Email(message = "Please provide a valid email")
+        @Lowercase(message = "Email must be in lowercase")
         String email,
 
         @NotBlank(message = "Password is required")
