@@ -5,6 +5,7 @@ import com.wbt.store.dtos.UserDto;
 import com.wbt.store.dtos.UserRegistrationDto;
 import com.wbt.store.dtos.UserUpdateRequest;
 import com.wbt.store.entities.User;
+import com.wbt.store.exceptions.ApiError;
 import com.wbt.store.repositories.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = {"/api/v1/users"})
@@ -27,7 +30,20 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> create(final @Valid @RequestBody UserRegistrationDto request, final UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<?> register(final @Valid @RequestBody UserRegistrationDto request, final UriComponentsBuilder uriBuilder) {
+
+        if (userRepository.existsByEmail(request.email())) {
+            return ResponseEntity.badRequest().body(
+                    new ApiError(
+                            HttpStatus.BAD_REQUEST.name(),
+                            uriBuilder.path("/api/v1/users").toUriString(),
+                            "Email already used",
+                            LocalDateTime.now(),
+                            Map.of("email", "This email is already registered")
+                    )
+            );
+        }
+
         final var user = this.userRepository.save(buildUserEntity(request));
         final var uri = uriBuilder.path("/api/v1/users/{id}").buildAndExpand(user.getId()).toUri();
         return ResponseEntity.created(uri).body(toUserDto(user));
@@ -60,7 +76,8 @@ public class UserController {
 
         final var user = optionalUser.get();
 
-        if (!user.getPassword().equals(request.oldPassword())) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (!user.getPassword().equals(request.oldPassword()))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         user.setPassword(request.newPassword());
         this.userRepository.save(user);
 
