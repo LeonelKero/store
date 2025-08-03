@@ -45,19 +45,7 @@ public class User {
         address.setUser(null);
     }
 
-    @ManyToMany
-    @JoinTable(
-            name = "wishlist",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "product_id")})
-    @Builder.Default
-    private Set<Product> wishlist = new HashSet<>();
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private Set<Wishlist> wishlist = new HashSet<>();
 
-    public void addToWishList(final Product product) {
-        this.wishlist.add(product);
-    }
-
-    public void removeToWishlist(final Product product) {
-        this.wishlist.remove(product);
-    }
 }
