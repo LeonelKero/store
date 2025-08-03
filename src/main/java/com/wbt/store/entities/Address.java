@@ -25,6 +25,6 @@ public class Address {
     private String street;
 
     @ManyToOne(cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
