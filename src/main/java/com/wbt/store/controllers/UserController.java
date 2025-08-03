@@ -2,10 +2,11 @@ package com.wbt.store.controllers;
 
 import com.wbt.store.dtos.ChangePasswordRequest;
 import com.wbt.store.dtos.UserDto;
-import com.wbt.store.dtos.UserRequestDto;
+import com.wbt.store.dtos.UserRegistrationDto;
 import com.wbt.store.dtos.UserUpdateRequest;
 import com.wbt.store.entities.User;
 import com.wbt.store.repositories.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> create(final @RequestBody UserRequestDto request, final UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<UserDto> create(final @Valid @RequestBody UserRegistrationDto request, final UriComponentsBuilder uriBuilder) {
         final var user = this.userRepository.save(buildUserEntity(request));
         final var uri = uriBuilder.path("/api/v1/users/{id}").buildAndExpand(user.getId()).toUri();
         return ResponseEntity.created(uri).body(toUserDto(user));
@@ -70,7 +71,7 @@ public class UserController {
         return new UserDto(user.getId(), user.getName(), user.getEmail());
     }
 
-    private static User buildUserEntity(final UserRequestDto request) {
+    private static User buildUserEntity(final UserRegistrationDto request) {
         return User.builder()
                 .name(request.name())
                 .email(request.email())
