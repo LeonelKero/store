@@ -3,6 +3,8 @@ package com.wbt.store.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Getter
 @Setter
@@ -28,4 +30,8 @@ public class CartItem {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    public BigDecimal getTotalPrice() {
+        return this.product.getPrice().multiply(BigDecimal.valueOf(quantity));
+    }
 }
