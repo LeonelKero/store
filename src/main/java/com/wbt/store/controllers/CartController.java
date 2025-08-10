@@ -2,6 +2,7 @@ package com.wbt.store.controllers;
 
 import com.wbt.store.dtos.AddToCartRequest;
 import com.wbt.store.dtos.CartDto;
+import com.wbt.store.dtos.ItemRequestDto;
 import com.wbt.store.entities.Cart;
 import com.wbt.store.entities.CartItem;
 import com.wbt.store.mappers.CartMapper;
@@ -9,12 +10,14 @@ import com.wbt.store.repositories.CartRepository;
 import com.wbt.store.repositories.ProductRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -75,22 +78,47 @@ public class CartController {
     }
 
     // Remove item from the cart
-    @DeleteMapping(path = {"/{id}"})
-    public ResponseEntity<?> removeItem(final @PathVariable(name = "id") UUID id, final @RequestParam(name = "item") Long itemId) {
+    @DeleteMapping(path = {"/{id}/items"})
+    public ResponseEntity<?> clearCart(final @PathVariable(name = "id") UUID id, final @RequestParam(name = "item") Long itemId) {
         return this.repository.findById(id).map(cart -> {
-            final var optionalItem = cart.getItems().stream().filter(item -> item.getId().equals(itemId)).findFirst();
-            if (optionalItem.isEmpty()) return ResponseEntity.notFound().build();
-            cart.removeItem(optionalItem.get());
-            this.repository.save(cart);
+            cart.getItems().forEach(item -> {
+                cart.removeItem(item);
+                this.repository.save(cart);
+            });
+
             return ResponseEntity.noContent().build();
-        }).orElse(ResponseEntity.notFound().build());
+        }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Cart not found")));
     }
 
     // Update cart content
-    @PutMapping(path = {"/{id}"})
-    public ResponseEntity<?> update(final @PathVariable(name = "id") UUID id) {
-        // How to update (is it add or remove item from the cart?)
-        return null;
+    @PutMapping(path = {"/{id}/items/{productId}"})
+    public ResponseEntity<?> update(final @PathVariable(name = "id") UUID id, final @PathVariable(name = "productId") Long productId, final @Valid @RequestBody ItemRequestDto itemDto) {
+        return this.repository.findById(id).map(cart -> {
+            final var optionalItem = cart.getItems().stream().filter(i -> i.getProduct().getId().equals(productId)).findFirst();
+            if (optionalItem.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Map.of("message", "Unable to cart item with ID: " + productId)
+            );
+
+            final var it = optionalItem.get();
+            it.setQuantity(itemDto.quantity());
+
+            return ResponseEntity.ok(this.cartMapper.toCartDto(this.repository.save(cart)));
+
+        }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                Map.of("message", "Unable to find cart with ID: " + id)));
+    }
+
+    // Remove product from the cart
+    @DeleteMapping(path = {"/{id}/items/{productId}"})
+    public ResponseEntity<?> removeProductItem(final @PathVariable(name = "id") UUID id, final @PathVariable(name = "productId") Long productId) {
+        return this.repository.findById(id).map(cart -> {
+            final var item = cart.getItems().stream().filter(it -> it.getProduct().getId().equals(productId)).findFirst();
+            if (item.isEmpty())
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Product not found in the cart."));
+            cart.removeItem(item.get());
+            this.repository.save(cart);
+            return ResponseEntity.ok().build();
+        }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Cart not found with ID: " + id)));
     }
 
     // Delete the cart
