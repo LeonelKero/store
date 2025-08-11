@@ -40,6 +40,6 @@ public class Product {
     private Set<User> users = new HashSet<>();
 
     @OneToMany(mappedBy = "product")
-    @JoinColumn(name = "card_item_id")
+    @Builder.Default
     private List<CartItem> cartItems = new ArrayList<>();
 }
