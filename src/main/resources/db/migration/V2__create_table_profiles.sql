@@ -1,7 +1,7 @@
 CREATE TABLE profiles (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     bio TEXT,
-    phone_number VARCHAR(255),
+    phone_number VARCHAR(20),
     date_of_birth DATE NOT NULL,
     loyalty_points INT,
     user_id BIGINT UNIQUE,
