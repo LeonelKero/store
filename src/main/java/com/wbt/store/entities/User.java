@@ -45,7 +45,8 @@ public class User {
         address.setUser(null);
     }
 
-    @OneToMany(mappedBy = "product", cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @Builder.Default
     private Set<Wishlist> wishlist = new HashSet<>();
 
 }

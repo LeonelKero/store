@@ -35,9 +35,9 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToMany(mappedBy = "wishlist")
+    @OneToMany(mappedBy = "product")
     @Builder.Default
-    private Set<User> users = new HashSet<>();
+    private Set<Wishlist> wishlists = new HashSet<>();
 
     @OneToMany(mappedBy = "product")
     @Builder.Default
