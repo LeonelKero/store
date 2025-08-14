@@ -12,6 +12,6 @@ import java.util.UUID;
 public interface CartRepository extends JpaRepository<Cart, UUID> {
 
     @EntityGraph(attributePaths = "items.product")
-    @Query("select c from Cart c where c.ic = :cartId")
+    @Query("select c from Cart c where c.id = :cartId")
     Optional<Cart> getCart(@Param("cartId") UUID cartId);
 }
