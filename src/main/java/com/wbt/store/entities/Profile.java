@@ -15,6 +15,7 @@ import java.time.LocalDate;
 public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     private String bio;
@@ -22,7 +23,7 @@ public class Profile {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(nullable = false, name = "date_of_birth")
+    @Column(nullable = false, name = "date_of_birth", insertable = false)
     private LocalDate dateOfBirth;
 
     @Column(name = "loyalty_points")
