@@ -7,6 +7,7 @@ import com.wbt.store.entities.Product;
 import com.wbt.store.repositories.CategoryRepository;
 import com.wbt.store.repositories.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductDto> create(final @RequestBody ProductRequestDto requestDto, final UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<ProductDto> create(final @Valid @RequestBody ProductRequestDto requestDto, final UriComponentsBuilder uriBuilder) {
         final var category = getCategory(requestDto.categoryId());
         final var product = Product.builder()
                 .price(requestDto.price())
