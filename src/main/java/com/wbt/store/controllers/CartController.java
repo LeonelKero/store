@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,6 +28,12 @@ public class CartController {
     private final CartRepository repository;
     private final ProductRepository productRepository;
     private final CartMapper cartMapper;
+
+    @GetMapping
+    public ResponseEntity<List<CartDto>> allCarts() {
+        final var carts = this.repository.findAll().stream().map(this.cartMapper::toCartDto).toList();
+        return ResponseEntity.ok(carts);
+    }
 
     // Show cart content
     @PostMapping
