@@ -10,6 +10,7 @@ import com.wbt.store.repositories.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -31,6 +32,15 @@ public class ProductController {
 
         final var products = productRepository.findByCategory_IdOrderByPriceAsc(category);
         return ResponseEntity.ok(products.stream().map(this::getProductDto).toList());
+    }
+
+    @GetMapping(path = {"/category/{id}"})
+    public ResponseEntity<List<ProductDto>> getProductsInCategory(final @PathVariable(name = "id") Byte id) {
+        return this.categoryRepository.findById(id)
+                .map(category -> {
+                    final var products = this.productRepository.findByCategory_Id(category.getId()).stream().map(this::getProductDto).toList();
+                    return ResponseEntity.ok(products);
+                }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @GetMapping(path = {"/{id}"})

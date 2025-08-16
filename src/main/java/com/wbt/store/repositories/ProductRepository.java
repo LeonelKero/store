@@ -22,4 +22,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     List<Product> findByProductsWithCategory();
 
     List<Product> findByCategory_IdOrderByPriceAsc(Byte id);
+
+    List<Product> findByCategory_Id(Byte id);
 }
