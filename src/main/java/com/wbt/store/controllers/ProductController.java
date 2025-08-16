@@ -4,6 +4,7 @@ import com.wbt.store.dtos.ProductDto;
 import com.wbt.store.dtos.ProductRequestDto;
 import com.wbt.store.entities.Category;
 import com.wbt.store.entities.Product;
+import com.wbt.store.mappers.CategoryMapper;
 import com.wbt.store.repositories.CategoryRepository;
 import com.wbt.store.repositories.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,14 +22,15 @@ import java.util.List;
 public class ProductController {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
     @GetMapping
     public ResponseEntity<List<ProductDto>> getAllProducts(final @RequestParam(name = "categoryId", required = false) Byte category) {
         if (category == null)
-            return ResponseEntity.ok(this.productRepository.findByProductsWithCategory().stream().map(ProductController::getProductDto).toList());
+            return ResponseEntity.ok(this.productRepository.findByProductsWithCategory().stream().map(this::getProductDto).toList());
 
         final var products = productRepository.findByCategory_IdOrderByPriceAsc(category);
-        return ResponseEntity.ok(products.stream().map(ProductController::getProductDto).toList());
+        return ResponseEntity.ok(products.stream().map(this::getProductDto).toList());
     }
 
     @GetMapping(path = {"/{id}"})
@@ -85,13 +87,13 @@ public class ProductController {
                 .orElseThrow(() -> new EntityNotFoundException("No category found with id: " + categoryId));
     }
 
-    private static ProductDto getProductDto(final Product product) {
+    private ProductDto getProductDto(final Product product) {
         return new ProductDto(
                 product.getId(),
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),
-                product.getCategory().getId()
+                categoryMapper.toCategoryResp(product.getCategory())
         );
     }
 

@@ -7,6 +7,6 @@ public record ProductDto(
         String name,
         String description,
         BigDecimal price,
-        Byte categoryId
+        CategoryResponse category
 ) {
 }
