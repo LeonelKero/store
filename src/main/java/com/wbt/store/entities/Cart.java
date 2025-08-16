@@ -23,7 +23,7 @@ public class Cart {
     private UUID id;
 
     @CreationTimestamp
-    @Column(updatable = false, insertable = false, nullable = false)
+    @Column(updatable = false, nullable = false)
     private LocalDateTime createdDate;
 
     @OneToMany(orphanRemoval = true)
