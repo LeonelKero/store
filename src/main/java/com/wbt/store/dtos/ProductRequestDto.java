@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 public record ProductRequestDto(
         @NotBlank(message = "Product name is required")
-        @Size(min = 2, max = 20, message = "Product name must be at least 2-20 characters")
+        @Size(min = 2, max = 20, message = "Product name must between 2-20 characters")
         String name,
 
         @NotBlank(message = "Product description is required")
