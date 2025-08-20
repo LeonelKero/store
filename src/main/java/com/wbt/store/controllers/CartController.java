@@ -43,7 +43,7 @@ public class CartController {
                 .path("/api/v1/carts/{id}")
                 .buildAndExpand(saved.getId())
                 .toUri();
-        final var cart = new CartDto(saved.getId(), Collections.emptySet(), BigDecimal.ZERO);
+        final var cart = new CartDto(saved.getId(), saved.getCreatedDate(), Collections.emptySet(), BigDecimal.ZERO);
         return ResponseEntity.created(uri).body(cart);
     }
 
@@ -71,22 +71,25 @@ public class CartController {
                 .findFirst()
                 .orElse(null);
         if (cartItem != null) {
+            // item already in cart
             cartItem.setQuantity(cartItem.getQuantity() + 1);
         } else {
+            // first add of the item
             final var newItem = CartItem.builder()
                     .quantity(1)
-                    .cart(existingCart)
                     .product(product.get())
                     .build();
             existingCart.addItem(newItem);
         }
 
-        return ResponseEntity.ok(this.cartMapper.toCartDto(this.repository.save(existingCart)));
+        Cart saved = this.repository.save(existingCart);
+        CartDto cartDto = this.cartMapper.toCartDto(saved);
+        return ResponseEntity.ok(cartDto);
     }
 
     // Remove item from the cart
     @DeleteMapping(path = {"/{id}/items"})
-    public ResponseEntity<?> clearCart(final @PathVariable(name = "id") UUID id, final @RequestParam(name = "item") Long itemId) {
+    public ResponseEntity<?> clearCart(final @PathVariable(name = "id") UUID id) {
         return this.repository.findById(id).map(cart -> {
             cart.getItems().forEach(item -> {
                 cart.removeItem(item);
@@ -134,6 +137,6 @@ public class CartController {
         return this.repository.findById(id).map(cart -> {
             this.repository.delete(cart);
             return ResponseEntity.ok().build();
-        }).orElse(ResponseEntity.notFound().build());
+        }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Cart not found with ID: " + id)));
     }
 }
