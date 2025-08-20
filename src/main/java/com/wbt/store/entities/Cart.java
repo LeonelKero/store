@@ -26,8 +26,10 @@ public class Cart {
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdDate;
 
-    @OneToMany(orphanRemoval = true)
-    @JoinColumn(name = "item_ids")
+    @OneToMany(
+            orphanRemoval = true,
+            mappedBy = "cart",
+            cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.MERGE})
     List<CartItem> items = new ArrayList<>();
 
     public void removeItem(final CartItem item) {
