@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.HashMap;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -19,26 +18,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleMethodArgumentNotValid(
             final MethodArgumentNotValidException ex,
             final WebRequest request) {
-        Map<String, String> errors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .collect(Collectors.toMap(
-                        FieldError::getField,
-                        error -> error.getDefaultMessage() != null ? error.getDefaultMessage() : "Validation failed"
-                ));
 
-        String path = request.getDescription(false).split("=").length > 1
-                ? request.getDescription(false).split("=")[1]
-                : "Unknown path";
-
-        ApiError apiError = new ApiError(
+        final var errors = new HashMap<String, String>();
+        ex.getBindingResult().getAllErrors().forEach(objectError -> {
+            final var field = ((FieldError) objectError).getField();
+            final var errorMsg = objectError.getDefaultMessage();
+            errors.put(field, errorMsg);
+        });
+        final var apiError = new ApiError(
                 HttpStatus.BAD_REQUEST.name(),
-                path,
-                "Validation failed",
+                request.getDescription(false).split("=")[1],
+                "Date constraint violation",
                 LocalDateTime.now(),
-                errors
-        );
-
+                errors);
         return ResponseEntity.badRequest().body(apiError);
     }
 

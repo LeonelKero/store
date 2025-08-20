@@ -14,6 +14,7 @@ public class CartMapper {
     public CartDto toCartDto(final Cart cart) {
         return new CartDto(
                 cart.getId(),
+                cart.getCreatedDate(),
                 cart.getItems().stream().map(item -> new CartItemDto(
                         new ProductItemDto(item.getProduct().getId(), item.getProduct().getName(), item.getProduct().getPrice()),
                         item.getQuantity(),
