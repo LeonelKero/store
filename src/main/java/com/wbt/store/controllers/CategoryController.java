@@ -2,46 +2,39 @@ package com.wbt.store.controllers;
 
 import com.wbt.store.dtos.CategoryRequest;
 import com.wbt.store.dtos.CategoryResponse;
-import com.wbt.store.entities.Category;
 import com.wbt.store.mappers.CategoryMapper;
-import com.wbt.store.repositories.CategoryRepository;
+import com.wbt.store.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(path = {"/api/v1/categories"})
 @RequiredArgsConstructor
 public class CategoryController {
 
-    private final CategoryRepository repository;
+    private final CategoryService service;
     private final CategoryMapper mapper;
 
     @PostMapping
     public ResponseEntity<?> createCategory(final @Valid @RequestBody CategoryRequest request, final UriComponentsBuilder uriBuilder) {
-        if (repository.findByNameIgnoreCase(request.name().trim()).isPresent())
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "Category name already exists"));
-        final var newCategory = new Category();
-        newCategory.setName(request.name().trim().toUpperCase());
-        final var savedCategory = this.repository.save(newCategory);
+        final var savedCategory = this.service.create(request);
         final var uri = uriBuilder.path("/api/v1/categories/{id}").buildAndExpand(savedCategory.getId()).toUri();
         return ResponseEntity.created(uri).body(this.mapper.toCategoryResp(savedCategory));
     }
 
     @GetMapping
     public ResponseEntity<List<CategoryResponse>> allCategories() {
-        return ResponseEntity.ok(this.repository.findAll().stream().map(this.mapper::toCategoryResp).toList());
+        return ResponseEntity.ok(this.service.getAll().stream().map(this.mapper::toCategoryResp).toList());
     }
 
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<CategoryResponse> getCategory(final @PathVariable(name = "id") Byte id) {
-        return this.repository.findById(id)
+        return this.service.get(id)
                 .map(category -> ResponseEntity.ok(this.mapper.toCategoryResp(category)))
                 .orElse(ResponseEntity.notFound().build());
     }
