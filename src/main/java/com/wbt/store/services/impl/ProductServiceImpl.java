@@ -1,9 +1,11 @@
 package com.wbt.store.services.impl;
 
 import com.wbt.store.entities.Product;
+import com.wbt.store.filters.ProductFilter;
 import com.wbt.store.repositories.ProductRepository;
 import com.wbt.store.repositories.specifications.ProductSpec;
 import com.wbt.store.services.ProductService;
+import com.wbt.store.specifications.ProductSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -58,5 +60,20 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<Product> fetchPagedProducts(final Integer page, final Integer size) {
         return this.repository.findAll(PageRequest.of(page, size));
+    }
+
+    @Override
+    public Page<Product> filteredProducts(final ProductFilter filter) {
+        final var pageable = PageRequest.of(filter.getPage(), filter.getSize());
+        final var productSpecs = buildProductSpecification(filter);
+        return this.repository.findAll(productSpecs, pageable);
+    }
+
+    private Specification<Product> buildProductSpecification(final ProductFilter filteringCriteria) {
+        return Specification.where(
+                ProductSpecification.hasName(filteringCriteria.getName())
+                        .and(ProductSpecification.hasCategoryName(filteringCriteria.getCategoryName()))
+                        .and(ProductSpecification.isInCategoryId(filteringCriteria.getCategoryId()))
+                        .and(ProductSpecification.hasPriceLessThan(filteringCriteria.getPrice())));
     }
 }

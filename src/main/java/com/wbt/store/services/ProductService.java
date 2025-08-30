@@ -1,6 +1,7 @@
 package com.wbt.store.services;
 
 import com.wbt.store.entities.Product;
+import com.wbt.store.filters.ProductFilter;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
@@ -16,4 +17,6 @@ public interface ProductService {
     List<Product> sortedProductByName();
 
     Page<Product> fetchPagedProducts(Integer page, Integer size);
+
+    Page<Product> filteredProducts(ProductFilter filter);
 }
