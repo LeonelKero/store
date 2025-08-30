@@ -4,12 +4,15 @@ import com.wbt.store.dtos.ProductDto;
 import com.wbt.store.dtos.ProductRequestDto;
 import com.wbt.store.entities.Category;
 import com.wbt.store.entities.Product;
+import com.wbt.store.filters.ProductFilter;
 import com.wbt.store.mappers.CategoryMapper;
 import com.wbt.store.repositories.CategoryRepository;
 import com.wbt.store.repositories.ProductRepository;
+import com.wbt.store.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,12 @@ public class ProductController {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final ProductService service;
+
+    @GetMapping(path = {"/all"})
+    public ResponseEntity<Page<ProductDto>> allProducts(final @ModelAttribute ProductFilter productFilter) {
+        return ResponseEntity.ok().body(this.service.filteredProducts(productFilter).map(this::getProductDto));
+    }
 
     @GetMapping
     public ResponseEntity<List<ProductDto>> getAllProducts(final @RequestParam(name = "categoryId", required = false) Byte category) {
