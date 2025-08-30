@@ -4,19 +4,18 @@ import com.wbt.store.dtos.CategoryRequest;
 import com.wbt.store.entities.Category;
 import com.wbt.store.exceptions.EntityResourceNotFoundException;
 import com.wbt.store.repositories.CategoryRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
+
     private final CategoryRepository repository;
 
-    public Category create(@Valid CategoryRequest request) {
+    public Category create(final CategoryRequest request) {
         if (repository.findByNameIgnoreCase(request.name().trim()).isPresent())
             throw new EntityResourceNotFoundException("Category resource not found");
 
@@ -30,7 +29,21 @@ public class CategoryService {
         return this.repository.findAll();
     }
 
-    public Optional<Category> get(Byte id) {
-        return this.repository.findById(id);
+    public Category get(final Byte id) {
+        return this.repository.findById(id).orElseThrow(() -> new EntityResourceNotFoundException("Category resource not found"));
+    }
+
+    public Byte delete(final Byte id) {
+        return this.repository.findById(id).map(category -> {
+            this.repository.delete(category);
+            return category.getId();
+        }).orElseThrow(() -> new EntityResourceNotFoundException("Category resource not found"));
+    }
+
+    public Category update(final Byte id, final CategoryRequest request) {
+        return this.repository.findById(id).map(category -> {
+            category.setName(request.name().trim().toUpperCase());
+            return this.repository.save(category);
+        }).orElseThrow(() -> new EntityResourceNotFoundException("Category resource not found"));
     }
 }

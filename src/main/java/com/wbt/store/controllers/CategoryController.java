@@ -34,25 +34,18 @@ public class CategoryController {
 
     @GetMapping(path = {"/{id}"})
     public ResponseEntity<CategoryResponse> getCategory(final @PathVariable(name = "id") Byte id) {
-        return this.service.get(id)
-                .map(category -> ResponseEntity.ok(this.mapper.toCategoryResp(category)))
-                .orElse(ResponseEntity.notFound().build());
+        final var category = this.service.get(id);
+        return ResponseEntity.ok(this.mapper.toCategoryResp(category));
     }
 
     @DeleteMapping(path = {"/{id}"})
-    public ResponseEntity<CategoryResponse> removeCategory(final @PathVariable(name = "id") Byte id) {
-        return this.repository.findById(id).map(category -> {
-            this.repository.delete(category);
-            return ResponseEntity.ok(this.mapper.toCategoryResp(category));
-        }).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Byte> removeCategory(final @PathVariable(name = "id") Byte id) {
+        return ResponseEntity.ok().body(this.service.delete(id));
     }
 
     @PutMapping(path = "/{id}")
     public ResponseEntity<CategoryResponse> update(final @PathVariable(name = "id") Byte id, final @Valid @RequestBody CategoryRequest request) {
-        return this.repository.findById(id).map(category -> {
-            category.setName(request.name().trim().toUpperCase());
-            final var updatedCategory = this.repository.save(category);
-            return ResponseEntity.ok(this.mapper.toCategoryResp(updatedCategory));
-        }).orElse(ResponseEntity.notFound().build());
+        final var updatedCategory = this.service.update(id, request);
+        return ResponseEntity.ok(this.mapper.toCategoryResp(updatedCategory));
     }
 }
