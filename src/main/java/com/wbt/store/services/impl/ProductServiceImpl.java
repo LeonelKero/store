@@ -1,7 +1,10 @@
 package com.wbt.store.services.impl;
 
+import com.wbt.store.dtos.ProductRequestDto;
 import com.wbt.store.entities.Product;
+import com.wbt.store.exceptions.EntityResourceNotFoundException;
 import com.wbt.store.filters.ProductFilter;
+import com.wbt.store.repositories.CategoryRepository;
 import com.wbt.store.repositories.ProductRepository;
 import com.wbt.store.repositories.specifications.ProductSpec;
 import com.wbt.store.services.ProductService;
@@ -19,6 +22,7 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository repository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public List<Product> getAllProducts() {
@@ -67,6 +71,52 @@ public class ProductServiceImpl implements ProductService {
         final var pageable = PageRequest.of(filter.getPage(), filter.getSize());
         final var productSpecs = buildProductSpecification(filter);
         return this.repository.findAll(productSpecs, pageable);
+    }
+
+    @Override
+    public Product getProduct(final Long id) {
+        return this.repository.findById(id)
+                .orElseThrow(() -> new EntityResourceNotFoundException("Product not found with id: " + id));
+    }
+
+    @Override
+    public void remove(final Long id) {
+        this.repository.findById(id)
+                .map(product -> {
+                    this.repository.delete(product);
+                    return id;
+                })
+                .orElseThrow(() -> new EntityResourceNotFoundException("Product not found with id: " + id));
+    }
+
+    @Override
+    public Product update(final Long id, final ProductRequestDto request) {
+        return this.repository.findById(id)
+                .map(product -> {
+                    if (request.name() != null) product.setName(request.name());
+                    if (request.description() != null) product.setDescription(request.description());
+                    if (request.price() != null) product.setPrice(request.price());
+                    if (request.categoryId() != null) {
+                        final var category = this.categoryRepository.findById(request.categoryId())
+                                .orElseThrow(() -> new EntityResourceNotFoundException("Category not found with id: " + request.categoryId()));
+                        product.setCategory(category);
+                    }
+                    return this.repository.save(product);
+                }).orElseThrow(() -> new EntityResourceNotFoundException("Product not found with id: " + id));
+
+    }
+
+    @Override
+    public Product save(final ProductRequestDto request) {
+        final var category = this.categoryRepository.findById(request.categoryId())
+                .orElseThrow(() -> new EntityResourceNotFoundException("Category not found with id: " + request.categoryId()));
+        final var product = Product.builder()
+                .price(request.price())
+                .name(request.name())
+                .description(request.description())
+                .category(category)
+                .build();
+        return this.repository.save(product);
     }
 
     private Specification<Product> buildProductSpecification(final ProductFilter filteringCriteria) {

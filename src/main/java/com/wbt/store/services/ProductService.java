@@ -1,7 +1,9 @@
 package com.wbt.store.services;
 
+import com.wbt.store.dtos.ProductRequestDto;
 import com.wbt.store.entities.Product;
 import com.wbt.store.filters.ProductFilter;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
@@ -19,4 +21,12 @@ public interface ProductService {
     Page<Product> fetchPagedProducts(Integer page, Integer size);
 
     Page<Product> filteredProducts(ProductFilter filter);
+
+    Product getProduct(Long id);
+
+    void remove(Long id);
+
+    Product update(Long id, ProductRequestDto request);
+
+    Product save(@Valid ProductRequestDto requestDto);
 }
