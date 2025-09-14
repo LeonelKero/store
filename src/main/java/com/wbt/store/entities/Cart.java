@@ -8,9 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "carts")
@@ -30,7 +28,7 @@ public class Cart {
             orphanRemoval = true,
             mappedBy = "cart",
             cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.MERGE})
-    List<CartItem> items = new ArrayList<>();
+    Set<CartItem> items = new HashSet<>();
 
     public void removeItem(final CartItem item) {
         this.items.remove(item);
@@ -46,5 +44,9 @@ public class Cart {
         return this.items.stream()
                 .map(CartItem::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add );
+    }
+
+    public void clear() {
+        this.items.clear();
     }
 }
