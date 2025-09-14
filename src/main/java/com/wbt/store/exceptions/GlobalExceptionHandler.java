@@ -10,6 +10,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -34,4 +35,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(apiError);
     }
 
+    @ExceptionHandler({EntityResourceNotFoundException.class})
+    public ResponseEntity<ApiError> handleResourceNotFound(final EntityResourceNotFoundException ex, final WebRequest request) {
+        final var apiError = new ApiError(
+                HttpStatus.NOT_FOUND.name(),
+                request.getDescription(false),
+                "Resource not found",
+                LocalDateTime.now(),
+                Map.of("error", ex.getMessage()));
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
 }
