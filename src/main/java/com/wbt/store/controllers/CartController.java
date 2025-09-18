@@ -7,6 +7,8 @@ import com.wbt.store.entities.Cart;
 import com.wbt.store.filters.CartFilter;
 import com.wbt.store.mappers.CartMapper;
 import com.wbt.store.services.CartService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,17 +23,20 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path = {"/api/v1/carts"})
 @RequiredArgsConstructor
+@Tag(name = "Cart", description = "Cart API endpoint")
 public class CartController {
     private final CartMapper cartMapper;
     private final CartService service;
 
     @GetMapping
+    @Operation(summary = "Get all carts grouped in page.")
     public ResponseEntity<Page<CartDto>> allCarts(final @ModelAttribute CartFilter filter) {
         final var carts = this.service.getAll(filter).map(this.cartMapper::toCartDto);
         return ResponseEntity.ok(carts);
     }
 
     @PostMapping
+    @Operation(summary = "Initialize a new cart.")
     public ResponseEntity<CartDto> initCart(final UriComponentsBuilder uriBuilder) {
         Cart saved = this.service.save(new Cart());
         final var uri = uriBuilder
@@ -43,12 +48,14 @@ public class CartController {
     }
 
     @GetMapping(path = "/{id}")
+    @Operation(summary = "Get a specific cart.")
     public ResponseEntity<CartDto> getCart(final @PathVariable(name = "id") UUID id) {
         return ResponseEntity.ok(this.cartMapper.toCartDto(this.service.get(id)));
     }
 
     // Add item to the cart
     @PostMapping(path = {"/{id}"})
+    @Operation(summary = "Add product to a specific cart.")
     public ResponseEntity<CartDto> addProduct(final @PathVariable(name = "id") UUID id, final @Valid @RequestBody AddToCartRequest request) {
         final var updatedCart = this.service.add(id, request);
         CartDto cartDto = this.cartMapper.toCartDto(updatedCart);
@@ -57,6 +64,7 @@ public class CartController {
 
     // Remove item from the cart
     @DeleteMapping(path = {"/{id}/items"})
+    @Operation(summary = "Clear a specific cart.")
     public ResponseEntity<CartDto> clearCart(final @PathVariable(name = "id") UUID id) {
         final var clearedCart = this.service.clear(id);
         return ResponseEntity.ok(this.cartMapper.toCartDto(clearedCart));
@@ -64,6 +72,7 @@ public class CartController {
 
     // Update cart content
     @PutMapping(path = {"/{id}/items/{productId}"})
+    @Operation(summary = "Update specific product in the cart.")
     public ResponseEntity<CartDto> update(final @PathVariable(name = "id") UUID id, final @PathVariable(name = "productId") Long productId, final @Valid @RequestBody ItemRequestDto itemDto) {
         final var updatedCart = this.service.update(id, productId, itemDto);
         return ResponseEntity.ok(this.cartMapper.toCartDto(updatedCart));
@@ -71,6 +80,7 @@ public class CartController {
 
     // Remove product from the cart
     @DeleteMapping(path = {"/{id}/items/{productId}"})
+    @Operation(summary = "Remove a product from specific cart.")
     public ResponseEntity<CartDto> removeProductItem(final @PathVariable(name = "id") UUID id, final @PathVariable(name = "productId") Long productId) {
         final var updatedCart = this.service.remove(id, productId);
         if (updatedCart == null) return ResponseEntity.badRequest().build();
@@ -80,6 +90,7 @@ public class CartController {
 
     // Delete the cart
     @DeleteMapping(path = {"/{id}"})
+    @Operation(summary = "Delete the cart.")
     public ResponseEntity<Void> deleteCart(final @PathVariable(name = "id") UUID id) {
         this.service.delete(id);
         return ResponseEntity.ok().build();
